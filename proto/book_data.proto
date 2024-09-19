@@ -1,0 +1,13 @@
+syntax = "proto3"; // 프로토콜 버전3 사용을 위해 입력
+
+// 불러온 API 형식에 맞게 메세지 정의
+// naver와 kakao의 필드가 조금씩 다름 -> 이것을 동일한 포맷으로 맞추는 작업 수행(공통 필드 중심으로)
+message Book {
+  string title = 1; // 제목 (1은 필드별 고유값을 부여하기 위해 기재(큰 의미는 없음))
+  string author = 2; // 작가
+  string publisher = 3; // 출판사
+  string isbn = 4; // ISBN(도서넘버)
+  int32 price = 5; // 가격
+  string publication_date = 6; // 출판일
+  string source = 7; // 소스 출처(naver, kakao) -> api에는 없지만 어떤 소스로부터 왔는지 쉽게 파악하기 위해 추가
+}
