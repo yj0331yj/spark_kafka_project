@@ -3,6 +3,7 @@ import json
 
 from confluent_kafka import Producer
 import proto.book_data_pb2 as pb2
+from keywords import book_keywords
 
 class NaverException(Exception):
     pass
@@ -32,7 +33,6 @@ def get_original_data(query: str) -> dict:
     return json.loads(res.text)
 
 if __name__ == '__main__':
-    original_data = get_original_data(query="베스트셀러")
 
     # kafka configs 세팅
     conf = {
@@ -41,19 +41,22 @@ if __name__ == '__main__':
     producer = Producer(conf)
     topic = "book"
 
-    for item in original_data['items']:
-        book = pb2.Book()
-        # dictionary -> protobuf
-        book.title = item['title']
-        book.author = item['author']
-        book.publisher = item['publisher']
-        book.isbn = item['isbn']
-        book.price = int(item['discount'])
-        book.publication_date = item['pubdate']
-        book.source = 'naver'
-        print("----")
-        print(book)
-        print("----")
-        producer.produce(topic= topic, value=book.SerializeToString())
-        producer.flush()
-        print("전송 완료")
+    for keyword in book_keywords:
+        original_data = get_original_data(query=keyword)
+
+        for item in original_data['items']:
+            book = pb2.Book()
+            # dictionary -> protobuf
+            book.title = item['title']
+            book.author = item['author']
+            book.publisher = item['publisher']
+            book.isbn = item['isbn']
+            book.price = int(item['discount'])
+            book.publication_date = item['pubdate']
+            book.source = 'naver'
+            print("----")
+            print(book)
+            print("----")
+            producer.produce(topic= topic, value=book.SerializeToString())
+            producer.flush()
+            print("전송 완료")

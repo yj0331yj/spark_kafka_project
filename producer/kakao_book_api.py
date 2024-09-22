@@ -5,6 +5,8 @@ import json
 from confluent_kafka import Producer
 
 import proto.book_data_pb2 as pb2
+from keywords import book_keywords
+
 class KakaoException(Exception):
     pass
 
@@ -31,7 +33,6 @@ def get_original_data(query: str) -> dict:
     return json.loads(res.text)
 
 if __name__ == '__main__':
-    original_data = get_original_data(query="베스트셀러")
 
     # kafka configs 세팅
     conf = {
@@ -41,19 +42,21 @@ if __name__ == '__main__':
     producer = Producer(conf)
     topic = "book"
 
-    for item in original_data['documents']:
-        book = pb2.Book()
+    for keyword in book_keywords:
+        original_data = get_original_data(query=keyword)
+        for item in original_data['documents']:
+            book = pb2.Book()
 
-        book.title = item['title']
-        book.author = '.'.join(item['authors']) # authors의 kakao json 형식은 list로 되어 있음 -> proto로 지정한 string 형식으로 변환 설정
-        book.publisher = item['publisher']
-        book.isbn = item['isbn']
-        book.price = int(item['price'])
-        book.publication_date = item['datetime']
-        book.source = 'kakao'
-        print("----")
-        print(book)
-        print("----")
-        producer.produce(topic=topic, value=book.SerializeToString()) # book은 protocol buffer 형태 이므로 string으로 변환해야 함
-        producer.flush() # 한 번에 많은 양의 데이터를 보내면 producer가 terminating되므로 flush를 사용해서 지연시킴(기다리게 함)
-        print("전송 완료")
+            book.title = item['title']
+            book.author = '.'.join(item['authors']) # authors의 kakao json 형식은 list로 되어 있음 -> proto로 지정한 string 형식으로 변환 설정
+            book.publisher = item['publisher']
+            book.isbn = item['isbn']
+            book.price = int(item['price'])
+            book.publication_date = item['datetime']
+            book.source = 'kakao'
+            print("----")
+            print(book)
+            print("----")
+            producer.produce(topic=topic, value=book.SerializeToString()) # book은 protocol buffer 형태 이므로 string으로 변환해야 함
+            producer.flush() # 한 번에 많은 양의 데이터를 보내면 producer가 terminating되므로 flush를 사용해서 지연시킴(기다리게 함)
+            print("전송 완료")
