@@ -12,7 +12,7 @@
 
 ## 2. 시스템 구성
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/81c8d4da-a771-44fd-b70c-4e908b41aae2/acc7c983-f381-4884-b9b5-e6edc9492af1/image.png)
+![image](https://github.com/user-attachments/assets/5c6ca077-121b-4a93-a935-4c1d510fdd53)
 
 - 카프카 브로커에 데이터를 전송하고, 컨슈머 부분은 스파크가 됨
 - 스파크 스트리밍 애플리케이션이 카프카의 토픽으로부터 데이터를 받아와서 통계치 계산
